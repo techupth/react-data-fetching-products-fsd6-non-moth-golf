@@ -9,29 +9,16 @@ function App() {
     try {
       setLoading(true);
       const result = await axios.get("http://localhost:4001/products");
-      console.log(result);
+      // console.log(result);
       setProduct(result.data.data);
       setLoading(false);
     } catch (error) {
-      console.log("Fetching Error...");
-    }
-  };
-  const removeProduct = async (id) => {
-    try {
-      await axios.delete(`http://localhost:4001/products/${id}`);
-    } catch (err) {
-      console.log("Can't delete data!");
+      console.log(error);
     }
   };
   useEffect(() => {
     getProduct();
   }, []);
-  const handleRemove = (productIndex, id) => {
-    const newProduct = [...product];
-    newProduct.splice(productIndex, 1);
-    setProduct(newProduct);
-    removeProduct(id);
-  };
   return (
     <div className="App">
       <div className="app-wrapper">
@@ -40,13 +27,13 @@ function App() {
       {loading ? (
         <div>"Loading..."</div>
       ) : (
-        product.map((data, index) => {
+        product.map((data) => {
           return (
-            <div className="product-list">
+            <div className="product-list" key={data.id}>
               <div className="product">
                 <div className="product-preview">
                   <img
-                    src="https://via.placeholder.com/350/350"
+                    src={data.image}
                     alt="some product"
                     width="350"
                     height="350"
@@ -59,9 +46,11 @@ function App() {
                 </div>
                 <button
                   className="delete-button"
-                  onClick={() => {
-                    handleRemove(index, data.id);
-                  }}
+                  onClick={async () => {
+                    await axios.delete(`http://localhost:4001/products/${data.id}`)
+                    getProduct()
+                  }
+                  }
                 >
                   x
                 </button>
